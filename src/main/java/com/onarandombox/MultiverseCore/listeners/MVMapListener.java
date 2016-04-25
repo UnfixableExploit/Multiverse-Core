@@ -14,8 +14,7 @@ import org.bukkit.map.MapView;
  * A listener for bukkit map events.
  */
 public class MVMapListener implements Listener {
-
-    private final MultiverseCore plugin;
+    public final MultiverseCore plugin;
 
     public MVMapListener(final MultiverseCore plugin) {
         this.plugin = plugin;
@@ -25,7 +24,8 @@ public class MVMapListener implements Listener {
      * This method is called when a map is initialized.
      * @param event The event that was fired.
      */
-    @EventHandler
+    @SuppressWarnings("deprecation")
+	@EventHandler
     public void mapInitialize(final MapInitializeEvent event) {
         for (final Player player : Bukkit.getOnlinePlayers()) {
             if ((player.getItemInHand().getType() == Material.MAP

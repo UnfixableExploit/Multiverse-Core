@@ -270,47 +270,6 @@ public class MVPermissions implements PermissionsInterface {
     }
 
     /**
-     * Checks to see if the sender has any parent perms.
-     * Stops when it finds one or when there are no more parents.
-     * This method is recursive.
-     *
-     * @param sender Who is asking for the permission.
-     * @param node   The permission node to check (possibly already a parent).
-     * @return True if they have any parent perm, false if none.
-     */
-    // TODO remove this...?
-    private boolean hasAnyParentPermission(CommandSender sender, String node) {
-        String parentPerm = this.pullOneLevelOff(node);
-        // Base case
-        if (parentPerm == null) {
-            return false;
-        }
-        // If they have a parent, they're good
-        if (this.checkActualPermission(sender, parentPerm + ".*")) {
-            return true;
-        }
-        return hasAnyParentPermission(sender, parentPerm);
-    }
-
-    /**
-     * Pulls one level off of a yaml style node.
-     * Given multiverse.core.list.worlds will return multiverse.core.list
-     *
-     * @param node The root node to check.
-     * @return The parent of the node
-     */
-    private static String pullOneLevelOff(String node) {
-        if (node == null) {
-            return null;
-        }
-        int index = node.lastIndexOf(".");
-        if (index > 0) {
-            return node.substring(0, index);
-        }
-        return null;
-    }
-
-    /**
      * Gets the type of this {@link PermissionsInterface}.
      * @return The type of this {@link PermissionsInterface}.
      */

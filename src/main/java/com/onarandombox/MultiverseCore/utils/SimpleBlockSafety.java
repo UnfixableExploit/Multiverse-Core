@@ -150,7 +150,8 @@ public class SimpleBlockSafety implements BlockSafety {
      * @param checkLoc The location to check for the other piece at
      * @return The location of the other bed piece, or null if it was a jacked up bed.
      */
-    private Location findOtherBedPiece(Location checkLoc) {
+    @SuppressWarnings("deprecation")
+	private Location findOtherBedPiece(Location checkLoc) {
         if (checkLoc.getBlock().getType() != Material.BED_BLOCK) {
             return null;
         }

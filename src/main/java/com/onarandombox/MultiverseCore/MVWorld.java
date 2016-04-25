@@ -352,7 +352,7 @@ public class MVWorld implements MultiverseWorld {
 
         @Override
         public Map<String, Object> serialize() {
-            return Collections.EMPTY_MAP;
+            return Collections.emptyMap();
         }
 
         /**
@@ -1224,7 +1224,8 @@ public class MVWorld implements MultiverseWorld {
         this.props.setAllowFlight(allowFlight);
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public String toString() {
         final JSONObject jsonData = new JSONObject();
         jsonData.put("Name", getName());

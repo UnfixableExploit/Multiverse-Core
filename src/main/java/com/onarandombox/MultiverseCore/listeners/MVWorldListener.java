@@ -21,7 +21,7 @@ import org.bukkit.event.world.WorldUnloadEvent;
  */
 public class MVWorldListener implements Listener {
     private MultiverseCore plugin;
-    private MVWorldManager worldManager;
+    public MVWorldManager worldManager;
 
     public MVWorldListener(MultiverseCore plugin) {
         this.plugin = plugin;

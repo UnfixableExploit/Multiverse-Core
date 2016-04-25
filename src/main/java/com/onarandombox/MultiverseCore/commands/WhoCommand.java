@@ -52,7 +52,7 @@ public class WhoCommand extends MultiverseCommand {
             showAll = false;
         }
 
-        final Collection onlinePlayers = plugin.getServer().getOnlinePlayers();
+        final Collection<? extends Player> onlinePlayers = plugin.getServer().getOnlinePlayers();
         final Collection<Player> visiblePlayers = new HashSet<Player>(onlinePlayers.size());
         for (final Object player : onlinePlayers) {
             if (player instanceof Player && (p == null || p.canSee((Player) player))) {
@@ -101,7 +101,7 @@ public class WhoCommand extends MultiverseCommand {
         return;
     }
 
-    private static String buildPlayerString(MultiverseWorld world, Player viewer, final Collection<Player> visiblePlayers) {
+    private String buildPlayerString(MultiverseWorld world, Player viewer, final Collection<Player> visiblePlayers) {
         // Retrieve the players in this world
         List<Player> players = world.getCBWorld().getPlayers();
         StringBuilder playerBuilder = new StringBuilder();

@@ -53,7 +53,8 @@ public class FileUtils {
         }
     }
 
-    private static final int COPY_BLOCK_SIZE = 1024;
+    @SuppressWarnings("unused")
+	private static final int COPY_BLOCK_SIZE = 1024;
 
     /**
      * Helper method to copy the world-folder.

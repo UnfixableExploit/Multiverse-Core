@@ -10,18 +10,10 @@ package com.onarandombox.MultiverseCore.commands;
 import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseCore.event.MVVersionEvent;
-import com.onarandombox.MultiverseCore.utils.webpaste.BitlyURLShortener;
-import com.onarandombox.MultiverseCore.utils.webpaste.PasteFailedException;
-import com.onarandombox.MultiverseCore.utils.webpaste.PasteService;
-import com.onarandombox.MultiverseCore.utils.webpaste.PasteServiceFactory;
-import com.onarandombox.MultiverseCore.utils.webpaste.PasteServiceType;
-import com.onarandombox.MultiverseCore.utils.webpaste.URLShortener;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionDefault;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import java.io.*;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +23,6 @@ import java.util.Map;
  * Dumps version info to the console.
  */
 public class VersionCommand extends MultiverseCommand {
-    private static final URLShortener SHORTENER = new BitlyURLShortener();
 
     public VersionCommand(MultiverseCore plugin) {
         super(plugin);
@@ -109,6 +100,8 @@ public class VersionCommand extends MultiverseCommand {
             while ((line = bufferedReader.readLine()) != null) {
                 result += line + '\n';
             }
+            // close FIXME
+            bufferedReader.close();
         } catch (FileNotFoundException e) {
             Logging.severe("Unable to find %s. Here's the traceback: %s", filename, e.getMessage());
             e.printStackTrace();
@@ -145,7 +138,6 @@ public class VersionCommand extends MultiverseCommand {
         }
 
         MVVersionEvent versionEvent = new MVVersionEvent(this.getLegacyString(), this.getVersionFiles());
-        final Map<String, String> files = this.getVersionFiles();
         this.plugin.getServer().getPluginManager().callEvent(versionEvent);
 
         // log to console
@@ -153,59 +145,6 @@ public class VersionCommand extends MultiverseCommand {
         String[] lines = data.split("\n");
         for (String line : lines) {
             Logging.info(line);
-        }
-
-        BukkitRunnable logPoster = new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (args.size() == 1) {
-                    String pasteUrl;
-                    if (args.get(0).equalsIgnoreCase("-p")) {
-                        // private post to pastie
-                        pasteUrl = postToService(PasteServiceType.PASTIE, true, data, files);
-                    } else if (args.get(0).equalsIgnoreCase("-b")) {
-                        // private post to pastebin
-                        pasteUrl = postToService(PasteServiceType.PASTEBIN, true, data, files);
-                    } else if (args.get(0).equalsIgnoreCase("-g")) {
-                        // private post to github
-                        pasteUrl = postToService(PasteServiceType.GITHUB, true, data, files);
-                    } else {
-                        return;
-                    }
-
-                    sender.sendMessage("Version info dumped here: " + ChatColor.GREEN + pasteUrl);
-                    Logging.info("Version info dumped here: %s", pasteUrl);
-                }
-            }
-        };
-
-        // Run the log posting operation asynchronously, since we don't know how long it will take.
-        logPoster.runTaskAsynchronously(this.plugin);
-    }
-
-    /**
-     * Send the current contents of this.pasteBinBuffer to a web service.
-     *
-     * @param type       Service type to send paste data to.
-     * @param isPrivate  Should the paste be marked as private.
-     * @param pasteData  Legacy string only data to post to a service.
-     * @param pasteFiles Map of filenames/contents of debug info.
-     * @return URL of visible paste
-     */
-    private static String postToService(PasteServiceType type, boolean isPrivate, String pasteData,
-                                        Map<String, String> pasteFiles) {
-        PasteService ps = PasteServiceFactory.getService(type, isPrivate);
-        try {
-            String result;
-            if (ps.supportsMultiFile()) {
-                result = ps.postData(ps.encodeData(pasteFiles), ps.getPostURL());
-            } else {
-                result = ps.postData(ps.encodeData(pasteData), ps.getPostURL());
-            }
-            return SHORTENER.shorten(result);
-        } catch (PasteFailedException e) {
-            System.out.print(e);
-            return "Error posting to service";
         }
     }
 }

@@ -39,7 +39,8 @@ public class CoordCommand extends MultiverseCommand {
         this.worldManager = this.plugin.getMVWorldManager();
     }
 
-    @Override
+    @SuppressWarnings("deprecation")
+	@Override
     public void runCommand(CommandSender sender, List<String> args) {
         // Check if the command was sent from a Player.
         if (sender instanceof Player) {

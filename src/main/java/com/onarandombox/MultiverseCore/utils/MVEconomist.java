@@ -211,7 +211,8 @@ public class MVEconomist {
 
         private static final String ECONOMY_NAME = "Simple Item Economy";
 
-        private static String getFormattedPrice(double amount, int currency) {
+        @SuppressWarnings("deprecation")
+		private static String getFormattedPrice(double amount, int currency) {
             if (isItemCurrency(currency)) {
                 Material m = Material.getMaterial(currency);
                 return m != null ? amount + " " + m.toString() : "NO ITEM FOUND";
@@ -224,7 +225,8 @@ public class MVEconomist {
             return ECONOMY_NAME;
         }
 
-        private static boolean hasEnough(Player player, double amount, int currency) {
+        @SuppressWarnings("deprecation")
+		private static boolean hasEnough(Player player, double amount, int currency) {
             if (isItemCurrency(currency)) {
                 return player.getInventory().contains(currency, (int) amount);
             } else {
@@ -244,13 +246,15 @@ public class MVEconomist {
             }
         }
 
-        private static void giveItem(Player player, double amount, int type) {
+        @SuppressWarnings("deprecation")
+		private static void giveItem(Player player, double amount, int type) {
             ItemStack item = new ItemStack(type, (int) amount);
             player.getInventory().addItem(item);
             showReceipt(player, (amount * -1), type);
         }
 
-        private static void takeItem(Player player, double amount, int type) {
+        @SuppressWarnings({ "unchecked", "deprecation" })
+		private static void takeItem(Player player, double amount, int type) {
             int removed = 0;
             HashMap<Integer, ItemStack> items = (HashMap<Integer, ItemStack>) player.getInventory().all(type);
             for (int i : items.keySet()) {

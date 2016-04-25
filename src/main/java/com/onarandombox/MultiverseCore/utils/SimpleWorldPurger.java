@@ -33,16 +33,14 @@ import java.util.List;
  */
 public class SimpleWorldPurger implements WorldPurger {
 
-    private MultiverseCore plugin;
-
     private Class<Entity> ambientClass = null;
 
-    public SimpleWorldPurger(MultiverseCore plugin) {
-        this.plugin = plugin;
+    @SuppressWarnings("unchecked")
+	public SimpleWorldPurger(MultiverseCore plugin) {
         try {
-            Class entityClass = Class.forName("org.bukkit.entity.Ambient");
+            Class<?> entityClass = Class.forName("org.bukkit.entity.Ambient");
             if (Entity.class.isAssignableFrom(entityClass)) {
-                ambientClass = entityClass;
+                ambientClass = (Class<Entity>) entityClass;
             }
         } catch (ClassNotFoundException ignore) { }
     }
@@ -134,7 +132,8 @@ public class SimpleWorldPurger implements WorldPurger {
         }
     }
 
-    private boolean killDecision(Entity e, List<String> thingsToKill, boolean negateAnimals,
+    @SuppressWarnings("deprecation")
+	private boolean killDecision(Entity e, List<String> thingsToKill, boolean negateAnimals,
             boolean negateMonsters, boolean specifiedAnimals, boolean specifiedMonsters) {
         boolean negate = false;
         boolean specified = false;

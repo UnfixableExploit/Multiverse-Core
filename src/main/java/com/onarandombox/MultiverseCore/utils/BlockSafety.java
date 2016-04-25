@@ -33,11 +33,6 @@ public class BlockSafety {
         return (downOne.getBlock().getType() == Material.AIR);
     }
 
-    // TODO maybe remove this?
-    private boolean blockIsNotSafe(World world, double x, double y, double z) {
-        return !playerCanSpawnHereSafely(world, x, y, z);
-    }
-
     /**
      * Checks if a player can spawn safely at the given coordinates.
      * @param world The {@link World}.
@@ -210,22 +205,6 @@ public class BlockSafety {
     public boolean isEntitiyOnTrack(Location l) {
         Material currentBlock = l.getBlock().getType();
         return (currentBlock == Material.POWERED_RAIL || currentBlock == Material.DETECTOR_RAIL || currentBlock == Material.RAILS);
-    }
-
-    // TODO maybe remove this?
-    private void showDangers(Location l) {
-        Location actual = new Location(l.getWorld(), l.getX(), l.getY(), l.getZ());
-        Location upOne = new Location(l.getWorld(), l.getX(), l.getY(), l.getZ());
-        Location downOne = new Location(l.getWorld(), l.getX(), l.getY(), l.getZ());
-        upOne.setY(upOne.getY() + 1);
-        downOne.setY(downOne.getY() - 1);
-
-        System.out.print("Location Up:   " + upOne.getBlock().getType());
-        System.out.print("               " + upOne);
-        System.out.print("Location:      " + actual.getBlock().getType());
-        System.out.print("               " + actual);
-        System.out.print("Location Down: " + downOne.getBlock().getType());
-        System.out.print("               " + downOne);
     }
 
     /**

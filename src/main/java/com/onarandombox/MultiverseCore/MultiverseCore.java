@@ -17,7 +17,6 @@ import com.onarandombox.MultiverseCore.api.MVPlugin;
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseCoreConfig;
 import com.onarandombox.MultiverseCore.api.MultiverseMessaging;
-import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
 import com.onarandombox.MultiverseCore.commands.AnchorCommand;
 import com.onarandombox.MultiverseCore.commands.CheckCommand;
@@ -91,7 +90,6 @@ import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Server;
-import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
@@ -104,18 +102,14 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.mcstats.Metrics;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -341,7 +335,6 @@ public class MultiverseCore extends JavaPlugin implements MVPlugin, Core {
         */
 
         this.initializeBuscript();
-        this.setupMetrics();
 
         // Output a little snippet to show it's enabled.
         Logging.config("Version %s (API v%s) Enabled - By %s", this.getDescription().getVersion(), PROTOCOL, getAuthors());
@@ -354,98 +347,6 @@ public class MultiverseCore extends JavaPlugin implements MVPlugin, Core {
         buscript = new Buscript(this);
         // Add global variable "multiverse" to javascript environment
         buscript.getGlobalScope().put("multiverse", buscript.getGlobalScope(), this);
-    }
-
-    /**
-     * Plotter for Environment-Values.
-     */
-    private static final class EnvironmentPlotter extends Metrics.Plotter {
-        private MultiverseCore core;
-        private final Environment env;
-
-        public EnvironmentPlotter(MultiverseCore core, Environment env) {
-            super(envToString(env));
-            this.core = core;
-            this.env = env;
-        }
-
-        private static String envToString(Environment env) {
-            return new StringBuilder().append(env.name().toUpperCase().charAt(0))
-                    .append(env.name().toLowerCase().substring(1)).toString();
-        }
-
-        @Override
-        public int getValue() {
-            int count = 0;
-            for (MultiverseWorld w : core.getMVWorldManager().getMVWorlds())
-                if (w.getEnvironment() == env)
-                    count++;
-            core.log(Level.FINE, String.format("Tracking %d worlds of type %s", count, env));
-            return count;
-        }
-    }
-
-    /**
-     * Plotter for Generator-Values.
-     */
-    private static final class GeneratorPlotter extends Metrics.Plotter {
-        private MultiverseCore core;
-        private final String gen;
-
-        public GeneratorPlotter(MultiverseCore core, String gen) {
-            super(gen);
-            this.core = core;
-            this.gen = gen;
-        }
-
-        @Override
-        public int getValue() {
-            int count = 0;
-            for (MultiverseWorld w : core.getMVWorldManager().getMVWorlds())
-                if (gen.equals(w.getGenerator()))
-                    count++;
-            core.log(Level.FINE, String.format("Tracking %d worlds of type %s", count, gen));
-            return count;
-        }
-    }
-
-    private void setupMetrics() {
-        try {
-            Metrics m = new Metrics(this);
-
-            Metrics.Graph envGraph = m.createGraph("Worlds by environment");
-            for (Environment env : Environment.values())
-                envGraph.addPlotter(new EnvironmentPlotter(this, env));
-
-            Metrics.Graph loadedWorldsGraph = m.createGraph("Worlds by environment");
-            loadedWorldsGraph.addPlotter(new Metrics.Plotter("Loaded worlds") {
-                @Override
-                public int getValue() {
-                    return getMVWorldManager().getMVWorlds().size();
-                }
-            });
-            loadedWorldsGraph.addPlotter(new Metrics.Plotter("Total number of worlds") {
-                @Override
-                public int getValue() {
-                    return getMVWorldManager().getMVWorlds().size()
-                            + getMVWorldManager().getUnloadedWorlds().size();
-                }
-            });
-
-            Set<String> gens = new HashSet<String>();
-            for (MultiverseWorld w : this.getMVWorldManager().getMVWorlds())
-                gens.add(w.getGenerator());
-            gens.remove(null);
-            gens.remove("null");
-            Metrics.Graph genGraph = m.createGraph("Custom Generators");
-            for (String gen : gens)
-                genGraph.addPlotter(new GeneratorPlotter(this, gen));
-
-            m.start();
-            log(Level.FINE, "Metrics have run!");
-        } catch (Exception e) {
-            log(Level.WARNING, "There was an issue while enabling metrics: " + e.getMessage());
-        }
     }
 
     private void initializeDestinationFactory() {
@@ -601,7 +502,7 @@ public class MultiverseCore extends JavaPlugin implements MVPlugin, Core {
             } else if (entry.getValue() instanceof ConfigurationSection) {
                 this.log(Level.FINE, "Migrating: " + entry.getKey());
                 // we have to migrate this
-                WorldProperties world = new WorldProperties(Collections.EMPTY_MAP);
+                WorldProperties world = new WorldProperties(Collections.<String, Object> emptyMap());
                 ConfigurationSection section = (ConfigurationSection) entry.getValue();
 
                 // migrate animals and monsters
@@ -1208,7 +1109,8 @@ public class MultiverseCore extends JavaPlugin implements MVPlugin, Core {
      * @param generator The Custom generator plugin to use.
      * @return True if success, false if fail.
      */
-    public Boolean cloneWorld(String oldName, String newName, String generator) {
+    @SuppressWarnings("deprecation")
+	public Boolean cloneWorld(String oldName, String newName, String generator) {
         return this.worldManager.cloneWorld(oldName, newName, generator);
     }
 
